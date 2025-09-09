@@ -4,7 +4,7 @@ const { Parser } = require("json2csv");
 
 async function getDiscover(pageNumber = 1) {
     try {
-        const limit = 1; // limit feeds dalam page
+        const limit = 5; // limit feeds dalam page
         const offset = (pageNumber - 1) * limit;
 
         const url = `https://shopee.co.id/api/v4/homepage/get_daily_discover?bundle=daily_discover_main&item_card=2&limit=${limit}&need_tab=false&offset=${offset}`;
@@ -46,7 +46,7 @@ async function getDiscover(pageNumber = 1) {
 //     }
 
 //     console.log("\n===============================");
-//     console.log('allFeeds:', allFeeds)
+//     // console.log('allFeeds:', allFeeds)
 //     console.log(`🎉 Total feeds scraped: ${allFeeds.length}`);
 //     console.log("===============================\n");
 
@@ -84,8 +84,8 @@ async function getDiscover(pageNumber = 1) {
 //                         is_on_flash_sale: item.is_on_flash_sale
 //                     },
 //                     price_info: {
-//                         price: item.price,
-//                         original_price: item.item_card_display_price.original_price,
+//                         price: item.price / 100000, 
+//                         original_price: item.item_card_display_price.original_price / 100000,
 //                         strikethrough_price: item.item_card_display_price.strikethrough_price,
 //                         hidden_price_display: item.hidden_price_display,
 //                         is_live_streaming_price: item.is_live_streaming_price,
@@ -133,7 +133,7 @@ async function scrapeMultiple(pages = 1) {
         const feeds = await getDiscover(i);
 
         feeds.forEach(feed => {
-            if (feed.type === "item_card" && feed.item_card?.item) {
+            if (feed.item_card?.item) {
                 const item = feed.item_card.item;
 
                 const clean = {
@@ -145,9 +145,9 @@ async function scrapeMultiple(pages = 1) {
                     estimated_delivery_time: item.estimated_delivery_time?.estimated_delivery_time_text || null,
                     is_sold_out: item.item_card_display_price?.is_sold_out,
                     is_on_flash_sale: item.is_on_flash_sale,
-                    price: item.price,
-                    original_price: item.item_card_display_price?.original_price,
-                    strikethrough_price: item.item_card_display_price?.strikethrough_price,
+                    price: item.price / 100000,
+                    original_price: item.item_card_display_price?.original_price ,
+                    strikethrough_price: item.item_card_display_price?.strikethrough_price / 100000,
                     hidden_price_display: item.hidden_price_display,
                     is_live_streaming_price: item.is_live_streaming_price,
                     discount_total: item.discount,
@@ -178,13 +178,12 @@ async function scrapeMultiple(pages = 1) {
     console.log(`\n🎉 Total items scraped: ${allItems.length}`);
 
     // Save as CSV
-    if (allItems.length > 0) {
-        const parser = new Parser();
-        const csv = parser.parse(allItems);
-        fs.writeFileSync("shopee_data.csv", csv);
-        console.log("✅ Data saved to shopee_data.csv");
-    }
+    // if (allItems.length > 0) {
+    //     const parser = new Parser();
+    //     const csv = parser.parse(allItems);
+    //     fs.writeFileSync("shopee_data.csv", csv);
+    //     console.log("✅ Data saved to shopee_data.csv");
+    // }
 }
 
-
-scrapeMultiple(5); // total page
+scrapeMultiple(1); // total page
