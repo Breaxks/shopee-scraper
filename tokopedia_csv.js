@@ -56,7 +56,11 @@ async function scrapeTokopedia(runNumber) {
             const originalPrice = card.slashedPriceInt || 0;
             const discountValue = originalPrice > 0 ? originalPrice - finalPrice : 0;
 
-            console.log(`${globalIndex}. ${card.name}`);
+            // calculate discount % (from values)
+            const discountPercentCalc =
+                originalPrice > 0 ? Math.round((discountValue / originalPrice) * 100) : 0;
+
+            // console.log(`${globalIndex}. ${card.name}`);
 
             // Push product into our array
             allProducts.push({
@@ -66,12 +70,14 @@ async function scrapeTokopedia(runNumber) {
                 finalPrice: card.price,
                 originalPrice: card.slashedPrice || null,
                 discountValue: discountValue > 0 ? `Rp${discountValue.toLocaleString("id-ID")}` : "None",
-                discountPercentage: card.discountPercentage,
+                discountPercentage: discountPercentCalc, // calculated manually
                 category: card.categoryBreadcrumbs,
                 url: card.url,
                 rating: card.rating,
                 ratingAverage: card.ratingAverage,
             });
+
+            console.log(allProducts)
 
             globalIndex++;
         });
