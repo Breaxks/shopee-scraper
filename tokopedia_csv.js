@@ -77,7 +77,7 @@ async function scrapeTokopedia(runNumber) {
                 ratingAverage: card.ratingAverage,
             });
 
-            console.log(allProducts)
+            console.log('Total Product:', allProducts.length)
 
             globalIndex++;
         });
@@ -100,14 +100,24 @@ function saveToCSV(data, filename) {
     console.log(`✅ CSV saved as ${filename}`);
 }
 
+function removeDuplicates(products) {
+    const seen = new Set();
+    return products.filter((p) => {
+        if (seen.has(p.id)) return false;
+        seen.add(p.id);
+        return true;
+    });
+}
+
 async function main() {
-    const runs = 2; // how many times you want to repeat
+    const runs = 50; // keep 2 runs if you want
     for (let i = 1; i <= runs; i++) {
         await scrapeTokopedia(i);
     }
 
     if (allProducts.length > 0) {
-        saveToCSV(allProducts, "tokopedia.csv");
+        const uniqueProducts = removeDuplicates(allProducts); // ✅ filter dupes
+        saveToCSV(uniqueProducts, "tokopedia.csv");
     } else {
         console.log("⚠️ No products to save.");
     }
